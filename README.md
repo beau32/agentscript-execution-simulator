@@ -5,7 +5,7 @@
 > **Fork with an AgentScript prompt and execution simulator.** This repository
 > builds on Salesforce's AgentScript project and adds an interactive **Simulate**
 > workspace to the UI. Use it to supply runtime-context JSON, observe how the
-> active script becomes an LLM system message, hold a multi-turn conversation,
+> AgentScript becomes an LLM system message, hold a multi-turn conversation,
 > route requests through LangChain to OpenAI, Anthropic, or Ollama, and inspect
 > grouped, credential-redacted request logs and simulated reasoning hooks.
 > See [Prompt and Execution Simulator](#prompt-and-execution-simulator) for
