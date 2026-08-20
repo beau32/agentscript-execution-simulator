@@ -9,6 +9,7 @@ import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { join, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { invokeWithLangChain } from './server/llm-runtime.mjs';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -77,9 +78,50 @@ async function exists(filePath) {
   }
 }
 
+async function readJsonBody(req) {
+  const chunks = [];
+  let total = 0;
+  for await (const chunk of req) {
+    total += chunk.length;
+    if (total > 1_000_000) throw new Error('Request body is too large.');
+    chunks.push(chunk);
+  }
+  return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+}
+
+function sendJson(res, status, body) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(body));
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathname = decodeURIComponent(url.pathname);
+
+  if (pathname === '/api/simulate') {
+    if (req.method !== 'POST') {
+      sendJson(res, 405, { error: 'Method not allowed.' });
+      return;
+    }
+    try {
+      const { config, messages } = await readJsonBody(req);
+      if (!config || !Array.isArray(messages)) {
+        sendJson(res, 400, {
+          error: 'A backend configuration and messages are required.',
+        });
+        return;
+      }
+      const result = await invokeWithLangChain({ config, messages });
+      sendJson(res, 200, result);
+    } catch (error) {
+      // Do not include credentials or the request body in server logs or errors.
+      sendJson(res, 400, {
+        error:
+          error instanceof Error ? error.message : 'Unable to invoke the LLM.',
+      });
+    }
+    return;
+  }
 
   // Defense in depth: refuse decoded paths containing NUL bytes or
   // backslashes. These never appear in legitimate static asset URLs and

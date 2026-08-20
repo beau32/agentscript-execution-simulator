@@ -9,6 +9,7 @@ import helloWorld from './hello_world.agent?raw';
 import weather from './weather.agent?raw';
 import caseEscalation from './case_escalation_bot.agent?raw';
 import orderTracking from './order_tracking_assistant.agent?raw';
+import orderLookup from './order_lookup.agent?raw';
 import leadQualification from './lead_qualification_bot.agent?raw';
 
 export interface ExampleScript {
@@ -39,6 +40,11 @@ export const EXAMPLE_SCRIPTS: ExampleScript[] = [
     name: 'Order Tracking Assistant',
     description: 'E-commerce agent for tracking orders and processing returns.',
     content: orderTracking,
+  },
+  {
+    name: 'Order Lookup',
+    description: 'Looks up an order by number through the Lookup_Order action.',
+    content: orderLookup,
   },
   {
     name: 'Lead Qualification Bot',

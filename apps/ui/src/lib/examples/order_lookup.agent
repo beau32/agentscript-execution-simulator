@@ -1,0 +1,55 @@
+system:
+    instructions: |
+        You are an order lookup assistant. Confirm the order number before discussing order details.
+
+config:
+    developer_name: "Order_Lookup"
+    description: "Looks up an order when the customer provides an order number."
+
+variables:
+    order_number: mutable string = ""
+        description: "Order number supplied by the customer"
+    order_found: mutable boolean = False
+        description: "Whether Lookup_Order returned an order"
+    order_status: mutable string = ""
+        description: "Current status returned from the order service"
+
+start_agent order_lookup:
+    description: "Looks up a customer order"
+
+    actions:
+        Lookup_Order:
+            description: "Retrieves an order by its order number"
+            label: "Lookup order"
+            require_user_confirmation: False
+            include_in_progress_indicator: True
+            inputs:
+                order_number: string
+                    label: "Order number"
+                    description: "The customer order number to find"
+                    is_required: True
+            outputs:
+                found: boolean
+                    label: "Order found"
+                    is_displayable: False
+                status: string
+                    label: "Order status"
+                    is_displayable: True
+            target: "flow://Lookup_Order"
+
+    reasoning:
+        instructions: ->
+            | Ask the customer for their order number if it has not been provided.
+            | When an order number is available, look it up and give a concise status update.
+        actions:
+            lookup_order: @actions.Lookup_Order
+                with order_number=@variables.order_number
+                set @variables.order_found = @outputs.found
+                set @variables.order_status = @outputs.status
+
+    after_reasoning:
+        if @variables.order_number != "":
+            run @actions.Lookup_Order
+                with order_number=@variables.order_number
+                set @variables.order_found = @outputs.found
+                set @variables.order_status = @outputs.status

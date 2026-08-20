@@ -35,14 +35,17 @@ export function initDevEnvironment(): void {
 }
 
 /**
- * Seed the store with built-in example scripts if no agents exist yet.
- * Safe to call on every startup — no-ops if agents are already present.
+ * Seed the store with built-in example scripts that are not already present.
+ * Existing agents and their edits are never overwritten.
  */
 export function seedDefaultAgents(): void {
   const { agents, createAgent, updateAgent } = useAgentStore.getState();
-  if (Object.keys(agents).length > 0) return;
+  const existingNames = new Set(
+    Object.values(agents).map(agent => agent.name.toLocaleLowerCase())
+  );
 
   for (const example of EXAMPLE_SCRIPTS) {
+    if (existingNames.has(example.name.toLocaleLowerCase())) continue;
     const id = createAgent(example.name);
     updateAgent(id, {
       description: example.description,

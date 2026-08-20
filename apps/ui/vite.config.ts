@@ -90,14 +90,12 @@ export default defineConfig({
       port: 27401,
     },
     port: 27002,
-    // Uncomment to enable API proxy when deploying with a backend server.
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:8080',
-    //     changeOrigin: true,
-    //     ws: true,
-    //   },
-    // },
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8080',
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [react(), tailwindcss()],
 });

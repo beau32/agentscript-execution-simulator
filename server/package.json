@@ -1,0 +1,11 @@
+{
+  "name": "@agentscript/simulator-runtime",
+  "private": true,
+  "type": "module",
+  "description": "Server-only LangChain runtime for the AgentScript UI simulator",
+  "dependencies": {
+    "@langchain/anthropic": "^1.0.0",
+    "@langchain/ollama": "^1.0.0",
+    "@langchain/openai": "^1.0.0"
+  }
+}

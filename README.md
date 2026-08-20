@@ -69,6 +69,51 @@ pnpm ui:dev
 
 Opens the AgentScript playground at `http://localhost:27002`.
 
+## Prompt and Execution Simulator
+
+The included UI has a **Simulate** workspace for inspecting how an AgentScript
+agent is prepared for an LLM request. It is intended for learning, debugging,
+and comparing design choices before connecting an agent to a production runtime.
+
+The simulator lets you:
+
+- provide runtime context as JSON, then compile the active AgentScript into its
+  system instructions;
+- hold a multi-turn user conversation and send it, together with the compiled
+  system message, to a configured LLM backend;
+- use OpenAI, Anthropic, or Ollama via the local LangChain runtime;
+- inspect grouped request logs and the sanitized API payload sent for each LLM
+  request, including the simulated `before_reasoning` and `after_reasoning`
+  execution chain;
+- test prompt-template branches and variable interpolation by changing the
+  runtime context and comparing subsequent requests.
+
+It illustrates an important boundary: resolving templates and deterministic
+hooks narrows the context and instructions supplied to an LLM, but it does not
+make a model response deterministic. The current simulator records actions in
+the execution chain but intentionally does not execute them.
+
+### Run the simulator with an LLM backend
+
+In one terminal, start the local API runtime:
+
+```bash
+npm install --prefix server
+node server.mjs
+```
+
+In another terminal, run the UI:
+
+```bash
+pnpm ui:dev
+```
+
+Open an agent, choose **Simulate**, enter runtime context, then select
+**Configure LLM** to set the provider, model, and (where required) API key.
+Settings are persisted only in the browser's local storage and are never added
+to request-log previews or source control. Do not use a shared browser profile
+for private credentials; use **Reset saved LLM settings** when finished.
+
 ### Use as a Library
 
 > Packages are published to npm under the `@sf-agentscript/*` scope. The `@agentscript/*` names used elsewhere in this repo are the internal monorepo names — see [`scripts/publish.mjs`](scripts/publish.mjs).

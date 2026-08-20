@@ -56,16 +56,15 @@ const allNavTabs = [
     flag: 'builder' as const,
   },
   { route: '/graph', icon: Network, label: 'Graph', flag: null },
-  {
-    route: '/simulate',
-    icon: Play,
-    label: 'Simulate',
-    flag: 'simulate' as const,
-  },
   { route: '/component', icon: Package, label: 'Component', flag: null },
 ];
 
 const navTabs = allNavTabs.filter(t => t.flag === null || featureFlags[t.flag]);
+const simulateTab = {
+  route: '/simulate',
+  icon: Play,
+  label: 'Simulate',
+};
 
 export function Header() {
   const { agentId } = useParams();
@@ -197,46 +196,82 @@ export function Header() {
 
       {/* Nav tabs as segmented control */}
       {showNavTabs && (
-        <nav
-          className="flex items-center gap-0.5 ml-2 rounded-full border p-0.5"
-          style={{
-            background: 'var(--ide-surface-sunken)',
-            borderColor: 'var(--ide-border-subtle)',
-          }}
-        >
-          {navTabs.map(({ route, icon: Icon, label }) => {
-            const isActive = location.pathname.includes(route);
-            const disabled = !agentId && route !== '/component';
-            return (
+        <>
+          <nav
+            aria-label="Agent views"
+            className="flex items-center gap-0.5 ml-2 rounded-full border p-0.5"
+            style={{
+              background: 'var(--ide-surface-sunken)',
+              borderColor: 'var(--ide-border-subtle)',
+            }}
+          >
+            {navTabs.map(({ route, icon: Icon, label }) => {
+              const isActive = location.pathname.includes(route);
+              const disabled = !agentId && route !== '/component';
+              return (
+                <button
+                  key={route}
+                  disabled={disabled}
+                  onClick={() => {
+                    void navigate(getRouteWithSelection(route));
+                  }}
+                  className={cn(
+                    'flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150',
+                    'disabled:opacity-40 disabled:pointer-events-none'
+                  )}
+                  style={{
+                    color: isActive
+                      ? 'var(--ide-text-primary)'
+                      : 'var(--ide-text-muted)',
+                    background: isActive
+                      ? 'var(--ide-surface-elevated)'
+                      : 'transparent',
+                    boxShadow: isActive
+                      ? '0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px var(--ide-border-subtle)'
+                      : 'none',
+                  }}
+                  title={label}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {featureFlags.simulate && agentId && (
+            <nav
+              aria-label="Simulation tools"
+              className="flex items-center rounded-full border p-0.5"
+              style={{
+                background: 'var(--ide-surface-sunken)',
+                borderColor: 'var(--ide-border-subtle)',
+              }}
+            >
               <button
-                key={route}
-                disabled={disabled}
                 onClick={() => {
-                  void navigate(getRouteWithSelection(route));
+                  void navigate(getRouteWithSelection(simulateTab.route));
                 }}
-                className={cn(
-                  'flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150',
-                  'disabled:opacity-40 disabled:pointer-events-none'
-                )}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-150"
                 style={{
-                  color: isActive
+                  color: location.pathname.includes(simulateTab.route)
                     ? 'var(--ide-text-primary)'
                     : 'var(--ide-text-muted)',
-                  background: isActive
+                  background: location.pathname.includes(simulateTab.route)
                     ? 'var(--ide-surface-elevated)'
                     : 'transparent',
-                  boxShadow: isActive
+                  boxShadow: location.pathname.includes(simulateTab.route)
                     ? '0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px var(--ide-border-subtle)'
                     : 'none',
                 }}
-                title={label}
+                title="Simulate prompts"
               >
-                <Icon className="h-3.5 w-3.5" />
-                <span>{label}</span>
+                <Play className="h-3.5 w-3.5" />
+                <span>{simulateTab.label}</span>
               </button>
-            );
-          })}
-        </nav>
+            </nav>
+          )}
+        </>
       )}
 
       {/* Spacer */}
