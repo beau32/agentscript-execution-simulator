@@ -2,6 +2,15 @@
 
 <!-- Badges go here once repo is public -->
 
+> **Fork with an AgentScript prompt and execution simulator.** This repository
+> builds on Salesforce's AgentScript project and adds an interactive **Simulate**
+> workspace to the UI. Use it to supply runtime-context JSON, observe how the
+> active script becomes an LLM system message, hold a multi-turn conversation,
+> route requests through LangChain to OpenAI, Anthropic, or Ollama, and inspect
+> grouped, credential-redacted request logs and simulated reasoning hooks.
+> See [Prompt and Execution Simulator](#prompt-and-execution-simulator) for
+> setup and usage.
+
 Agent Script is an open agent specification language. It allows you to configure agents
 with a common set of building blocks. It was developed for agentforce, but is meant to apply towards agents in general.
 
